@@ -16,12 +16,14 @@ function downloadFile() {
     wget 'https://download.jetbrains.com/go/goland-2021.3.3.tar.gz' -O /opt/tools/goland.tar.gz
     wget 'https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz' -O /opt/tools/maven.tar.gz
     wget 'https://services.gradle.org/distributions/gradle-7.4.1-all.zip' -O /opt/tools/gradle.zip
+    wget 'https://go.dev/dl/go1.18.linux-amd64.tar.gz' -O /opt/tools/golang.tar.gz
 }
 
 function creatShortCut() {
     tar -xvf /opt/tools/idea.tar.gz -C /opt/tools/
     tar -xvf /opt/tools/goland.tar.gz -C /opt/tools/
     tar -xvf /opt/tools/maven.tar.gz -C /opt/tools/
+    tar -xvf /opt/tools/golang.tar.gz -C /opt/tools/
     unzip -d /opt/tools/ /opt/tools/gradle.zip
 
     ideaVersion=$(find /opt/tools/ -maxdepth 1 -type d -name "*idea*" | awk -F "/" '{print $4}'|uniq)
@@ -71,11 +73,7 @@ function banSpyCommunication() {
 }
 
 createDirs
-
 downloadFile
-
 creatShortCut
-
 hotfix
-
 banSpyCommunication
