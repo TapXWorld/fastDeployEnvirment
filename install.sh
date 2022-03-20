@@ -75,5 +75,4 @@ function banSpyCommunication() {
 createDirs
 downloadFile
 creatShortCut
-hotfix
 banSpyCommunication
