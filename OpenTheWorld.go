@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/TapXWorld/oneKeyDeveloment/linux"
-	"github.com/TapXWorld/oneKeyDeveloment/windows"
+	"github.com/TapXWorld/fastDeployEnvirment/linux"
+	"github.com/TapXWorld/fastDeployEnvirment/windows"
 	"runtime"
 )
 
 func main() {
 	if "windows" == runtime.GOOS {
 
-		wf := windows.WindowsPlatform{Path: "test"}
+		wf := windows.WindowsPlatform{path: "test"}
 
 		fmt.Println(wf)
 
 	} else {
-		lp := linux.LinuxPlatform{Path: ""}
+		lp := linux.LinuxPlatform{path: ""}
 	}
 }

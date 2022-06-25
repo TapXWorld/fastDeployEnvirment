@@ -1,7 +1,7 @@
 package windows
 
 type WindowsPlatform struct {
-	Path string
+	path string
 }
 
 func (j *WindowsPlatform) DownloadIdea() bool {
