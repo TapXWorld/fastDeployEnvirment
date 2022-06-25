@@ -1,41 +1,41 @@
 package linux
 
-type linuxPlatform struct {
+type LinuxPlatform struct {
 	path string
 }
 
-func (j *linuxPlatform) downloadIdea() bool {
+func (j *LinuxPlatform) DownloadIdea() bool {
 	return false
 }
 
-func (j *linuxPlatform) downloadMaven() bool {
+func (j *LinuxPlatform) DownloadMaven() bool {
 	return false
 }
 
-func (j *linuxPlatform) downloadGradle() bool {
+func (j *LinuxPlatform) DownloadGradle() bool {
 	return false
 }
 
-func (j *linuxPlatform) downloadJava() bool {
+func (j *LinuxPlatform) DownloadJava() bool {
 	return false
 }
 
-func (j *linuxPlatform) installIdea() bool {
+func (j *LinuxPlatform) InstallIdea() bool {
 	return false
 }
 
-func (j *linuxPlatform) installMaven() bool {
+func (j *LinuxPlatform) InstallMaven() bool {
 	return false
 }
 
-func (j *linuxPlatform) installGradle() bool {
+func (j *LinuxPlatform) InstallGradle() bool {
 	return false
 }
 
-func (j *linuxPlatform) installJava() bool {
+func (j *LinuxPlatform) InstallJava() bool {
 	return false
 }
 
-func (j *linuxPlatform) configEnv() bool {
+func (j *LinuxPlatform) ConfigEnv() bool {
 	return false
 }

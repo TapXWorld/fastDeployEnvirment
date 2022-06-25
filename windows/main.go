@@ -1,41 +1,41 @@
 package windows
 
-type windowsPlatform struct {
-	path string
+type WindowsPlatform struct {
+	Path string
 }
 
-func (j *windowsPlatform) downloadIdea() bool {
+func (j *WindowsPlatform) DownloadIdea() bool {
 	return false
 }
 
-func (j *windowsPlatform) downloadMaven() bool {
+func (j *WindowsPlatform) DownloadMaven() bool {
 	return false
 }
 
-func (j *windowsPlatform) downloadGradle() bool {
+func (j *WindowsPlatform) DownloadGradle() bool {
 	return false
 }
 
-func (j *windowsPlatform) downloadJava() bool {
+func (j *WindowsPlatform) DownloadJava() bool {
 	return false
 }
 
-func (j *windowsPlatform) installIdea() bool {
+func (j *WindowsPlatform) InstallIdea() bool {
 	return false
 }
 
-func (j *windowsPlatform) installMaven() bool {
+func (j *WindowsPlatform) InstallMaven() bool {
 	return false
 }
 
-func (j *windowsPlatform) installGradle() bool {
+func (j *WindowsPlatform) InstallGradle() bool {
 	return false
 }
 
-func (j *windowsPlatform) installJava() bool {
+func (j *WindowsPlatform) InstallJava() bool {
 	return false
 }
 
-func (j *windowsPlatform) configEnv() bool {
+func (j *WindowsPlatform) ConfigEnv() bool {
 	return false
 }
