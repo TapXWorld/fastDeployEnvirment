@@ -7,9 +7,9 @@ import (
 func main() {
 	if "windows" == runtime.GOOS {
 
-		//wf := windowsPlatform{""}
+		wf := windowsPlatform{}
 
 	} else {
-
+		lp := linuxPlatform{}
 	}
 }
