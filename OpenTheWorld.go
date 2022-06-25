@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/TapXWorld/oneKey_develoment/linux"
-	"github.com/TapXWorld/oneKey_develoment/windows"
+	"github.com/TapXWorld/oneKeyDeveloment/linux"
+	"github.com/TapXWorld/oneKeyDeveloment/windows"
 	"runtime"
 )
 
