@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -103,5 +104,12 @@ func main() {
 	installOptions()
 
 	fmt.Println(user)
+
+	if "windows" == runtime.GOOS {
+		user.systemType = 0
+	} else {
+		user.systemType = 1
+	}
+
 	//time.Sleep(time.Second * 10)
 }
