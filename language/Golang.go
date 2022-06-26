@@ -4,38 +4,20 @@ type Golang struct {
 	Path string
 }
 
-func (g *Golang) DownloadIdea() bool {
+
+
+func (u *User,s *Software) downloadGoland() bool {
 	return false
 }
 
-func (g *Golang) DownloadMaven() bool {
+func (g *Golang) installGoland() bool {
 	return false
 }
 
-func (g *Golang) DownloadGradle() bool {
+func (g *Golang) downloadGolang() bool {
 	return false
 }
 
-func (g *Golang) DownloadJava() bool {
-	return false
-}
-
-func (g *Golang) InstallIdea() bool {
-	return false
-}
-
-func (g *Golang) InstallMaven() bool {
-	return false
-}
-
-func (g *Golang) InstallGradle() bool {
-	return false
-}
-
-func (g *Golang) InstallJava() bool {
-	return false
-}
-
-func (g *Golang) ConfigEnv() bool {
+func (g *Golang) installGolang() bool {
 	return false
 }
