@@ -29,8 +29,6 @@ type User struct {
 	systemType   int //0 window 1 linux
 }
 
-var meta = Meta{}
-
 func cacheVersionInfo() {
 	data, _ := os.ReadFile("meta.yml")
 
@@ -72,10 +70,7 @@ func validateInput(u User) bool {
 	return false
 }
 
-func main() {
-	cacheVersionInfo()
-
-	user := User{}
+func installOptions() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Println("--- Which product of you want download( IDEA,Goland,WebStorm,PhpStorm,PyCharm )? ")
@@ -92,11 +87,21 @@ func main() {
 		user.downloadPath = string(savePath)
 
 		if validateInput(user) {
-			fmt.Println("validate error,input again.")
+			fmt.Println("validate error,　input again.")
 		} else {
 			break
 		}
 	}
+}
+
+var user = User{}
+
+var meta = Meta{}
+
+func main() {
+	cacheVersionInfo()
+	installOptions()
+
 	fmt.Println(user)
 	//time.Sleep(time.Second * 10)
 }
