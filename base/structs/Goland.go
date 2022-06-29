@@ -1,6 +1,6 @@
 package structs
 
-type GoLand struct {
+type Goland struct {
 	Name     string `json:"name"`
 	Link     string `json:"link"`
 	Releases []struct {

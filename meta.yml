@@ -5,7 +5,7 @@ software:
     parameters: ?code=IIU&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_={timestamp}
 
 -   product_name: Goland
-    product_code: go
+    product_code: Go
     parameters: ?code=GO&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_={timestamp}
 
 -   product_name: WebStorm
@@ -13,7 +13,7 @@ software:
     parameters: ?code=WS&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_={timestamp}
 
 -   product_name: PhpStorm
-    product_code: WS
+    product_code: PS
     parameters: ?code=PS&release.type=eap%2Crc%2Crelease&fields=distributions%2Clink%2Cname%2Creleases&_={timestamp}
 
 -   product_name: PyCharm

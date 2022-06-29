@@ -15,21 +15,6 @@ import (
 	"time"
 )
 
-type Meta struct {
-	Url      string
-	Software []struct {
-		ProductName string `yaml:"product_name"`
-		ProductCode string `yaml:"product_code"`
-		Parameters  string `yaml:"parameters"`
-	}
-}
-
-type User struct {
-	productName  string
-	downloadPath string
-	systemType   int //0 window 1 linux
-}
-
 func cacheVersionInfo() {
 	data, _ := os.ReadFile("meta.yml")
 
@@ -53,18 +38,16 @@ func cacheVersionInfo() {
 }
 
 func validateInput(u User) bool {
-	productName := strings.Split(u.productName, ",")
-
-	for i := 0; i < len(productName); i++ {
+	for i := 0; i < len(u.productName); i++ {
 		inputError := true
 
 		for j := 0; j < len(meta.Software); j++ {
-
-			if strings.ToLower(productName[i]) == strings.ToLower(meta.Software[j].ProductName) {
+			if strings.ToLower(u.productName[i]) == strings.ToLower(meta.Software[j].ProductName) {
 				inputError = false
 			}
 		}
 		if inputError {
+			fmt.Println("---> product name error. please input again.")
 			return true
 		}
 	}
@@ -74,14 +57,17 @@ func validateInput(u User) bool {
 func installOptions() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Println("--- Which product of you want download( IDEA,Goland,WebStorm,PhpStorm,PyCharm )? ")
-		fmt.Print("  (default(IDEA,Goland): ): ")
+		fmt.Println("Which product of you want download( IDEA,Goland,WebStorm,PhpStorm,PyCharm )? ")
+		fmt.Print("----->  (default(IDEA,Goland): ): ")
 
 		str, _, _ := reader.ReadLine()
-		user.productName = string(str)
 
-		fmt.Println("--- Where to save? ")
-		fmt.Print("  (default: \"D:\\software\\\"): ")
+		product := strings.Replace(string(str), " ", "", -1)
+
+		user.productName = strings.Split(product, ",")
+
+		fmt.Println("Where to save? ")
+		fmt.Print("----->  (default: \"D:\\software\\\"): ")
 
 		savePath, _, _ := reader.ReadLine()
 
@@ -93,6 +79,21 @@ func installOptions() {
 			break
 		}
 	}
+}
+
+type Meta struct {
+	Url      string
+	Software []struct {
+		ProductName string `yaml:"product_name"`
+		ProductCode string `yaml:"product_code"`
+		Parameters  string `yaml:"parameters"`
+	}
+}
+
+type User struct {
+	productName  []string
+	downloadPath string
+	systemType   int //0 window 1 linux
 }
 
 var user = User{}
@@ -112,4 +113,8 @@ func main() {
 	}
 
 	//time.Sleep(time.Second * 10)
+}
+
+func download(productName string) {
+
 }
