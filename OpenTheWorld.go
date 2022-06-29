@@ -2,13 +2,16 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"github.com/TapXWorld/fastDeployEnvirment/base/structs"
 	"github.com/TapXWorld/fastDeployEnvirment/utils"
 	"github.com/goccy/go-yaml"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -81,6 +84,14 @@ func installOptions() {
 	}
 }
 
+func initStruct() {
+	regStruct["IIU"] = structs.IIU{}
+	regStruct["Go"] = structs.Goland{}
+	regStruct["WS"] = structs.WebStorm{}
+	regStruct["PS"] = structs.PhpStorm{}
+	regStruct["PCP"] = structs.PyCharm{}
+}
+
 type Meta struct {
 	Url      string
 	Software []struct {
@@ -101,10 +112,10 @@ var user = User{}
 var meta = Meta{}
 
 func main() {
+	initStruct()
+
 	cacheVersionInfo()
 	installOptions()
-
-	fmt.Println(user)
 
 	if "windows" == runtime.GOOS {
 		user.systemType = 0
@@ -112,9 +123,39 @@ func main() {
 		user.systemType = 1
 	}
 
-	//time.Sleep(time.Second * 10)
+	for _, name := range user.productName {
+		for j := 0; j < len(meta.Software); j++ {
+			if strings.EqualFold(name, meta.Software[j].ProductName) {
+				go install(meta.Software[j].ProductCode)
+			}
+		}
+	}
+	fmt.Println("All Completed.")
+	time.Sleep(time.Second * 100)
 }
 
-func download(productName string) {
+var regStruct = make(map[string]interface{})
 
+func install(pCode string) {
+	//read json file by product code
+	b, _ := ioutil.ReadFile(".cache/" + pCode + ".cache")
+
+	if regStruct[pCode] != nil {
+		newObj := reflect.ValueOf(regStruct[pCode]).Type()
+
+		t := reflect.New(newObj).Elem()
+		productStruct := t.Interface()
+
+
+		if "IIU" == pCode {
+			obj := (structs.IIU)productStruct
+		}
+
+		json.Unmarshal(b, &obj)
+		fmt.Println("ok")
+		fmt.Println(productStruct)
+	}
+	//product
+	//json.Unmarshal(b, &)
+	fmt.Println(1)
 }
