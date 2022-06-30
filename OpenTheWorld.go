@@ -132,38 +132,26 @@ func main() {
 					newObj := reflect.ValueOf(regStruct[code]).Type()
 
 					b, _ := ioutil.ReadFile(".cache/" + code + ".cache")
-
 					t := reflect.New(newObj).Elem()
 
+					var obj any
 					if "IIU" == code {
-						obj := t.Interface().(structs.IIU)
-						json.Unmarshal(b, &obj)
-
-						go install(code, obj)
+						obj = regStruct[code].(structs.IIU)
 					} else if "Go" == code {
-						obj := t.Interface().(structs.Goland)
-						json.Unmarshal(b, &obj)
-
-						go install(code, obj)
+						obj = t.Interface().(structs.Goland)
 					} else if "WS" == code {
-						obj := t.Interface().(structs.WebStorm)
-						json.Unmarshal(b, &obj)
-
-						go install(code, obj)
+						obj = t.Interface().(structs.WebStorm)
 					} else if "PS" == code {
-						obj := t.Interface().(structs.PhpStorm)
-						json.Unmarshal(b, &obj)
-
-						go install(code, obj)
+						obj = t.Interface().(structs.PhpStorm)
 					} else if "PCP" == code {
-						obj := t.Interface().(structs.PyCharm)
-						json.Unmarshal(b, &obj)
-
-						go install(code, obj)
+						obj = t.Interface().(structs.PyCharm)
 					} else {
 						return
 					}
-					fmt.Println("ok")
+					fmt.Println(obj.(structs.IIU))
+
+					json.Unmarshal(b, (obj.(structs.IIU)))
+					go install(code, obj)
 				}
 			}
 		}
@@ -182,45 +170,20 @@ type UnzipStruct struct {
 func install(name string, s interface{}) {
 	unzipFileArr := make([]UnzipStruct, 0)
 
+	var url string
 	if "IIU" == name {
-		url := s.(structs.IIU).Releases[0].Downloads.WindowsZip.Link
-		urlArr := strings.Split(url, "/")
-
-		filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-
-		unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
+		url = s.(structs.IIU).Releases[0].Downloads.WindowsZip.Link
 	} else if "Go" == name {
-		url := s.(structs.Goland).Releases[0].Downloads.WindowsZip.Link
-		urlArr := strings.Split(url, "/")
-
-		filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-
-		unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
+		url = s.(structs.Goland).Releases[0].Downloads.WindowsZip.Link
 	} else if "WS" == name {
-		url := s.(structs.WebStorm).Releases[0].Downloads.Windows.Link
-		urlArr := strings.Split(url, "/")
-
-		filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-
-		unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
+		url = s.(structs.WebStorm).Releases[0].Downloads.Windows.Link
 	} else if "PS" == name {
-		url := s.(structs.PhpStorm).Releases[0].Downloads.Windows.Link
-		urlArr := strings.Split(url, "/")
-
-		filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-
-		unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
+		url = s.(structs.PhpStorm).Releases[0].Downloads.Windows.Link
 	} else if "PCP" == name {
-		url := s.(structs.PyCharm).Releases[0].Downloads.Windows.Link
-		urlArr := strings.Split(url, "/")
-
-		filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-
-		unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
+		url = s.(structs.PyCharm).Releases[0].Downloads.Windows.Link
 	}
+	urlArr := strings.Split(url, "/")
+	filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
+	utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
+	unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
 }
