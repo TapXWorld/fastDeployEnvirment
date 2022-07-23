@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/TapXWorld/fastDeployEnvirment/base/structs"
 	"github.com/TapXWorld/fastDeployEnvirment/utils"
+	yaml "github.com/goccy/go-yaml"
 	"io"
 	"io/ioutil"
 	"log"
@@ -136,7 +137,6 @@ func loadProductJson() {
 }
 
 func main() {
-	//load all cache json data to product struct
 	loadProductJson()
 	cacheVersionInfo()
 	installOptions()

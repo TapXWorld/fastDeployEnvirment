@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	b64 "encoding/base64"
 	"fmt"
+	"github.com/schollz/progressbar/v3"
 	"io"
 	"log"
 	"net/http"
@@ -21,16 +22,20 @@ func HttpGet(url string) *http.Response {
 }
 
 func HttpDownload(url string, path string, saveName string) bool {
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	out, _ := os.Create(path + "/" + saveName)
+	req, _ := http.NewRequest("GET", url, nil)
+	resp, _ := http.DefaultClient.Do(req)
 
-	defer out.Close()
+	f, _ := os.OpenFile(path+"/"+saveName, os.O_CREATE|os.O_WRONLY, 0644)
 
-	io.Copy(out, resp.Body)
+	defer f.Close()
 
+	fmt.Println(resp.ContentLength)
+
+	bar := progressbar.DefaultBytes(
+		resp.ContentLength,
+		"downloading",
+	)
+	io.Copy(io.MultiWriter(f, bar), resp.Body)
 	return true
 }
 
