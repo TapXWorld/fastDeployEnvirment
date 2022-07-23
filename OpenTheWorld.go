@@ -59,8 +59,13 @@ func validateInput(u User) bool {
 func installOptions() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Println("Which product of you want download( IDEA,Goland,WebStorm,PhpStorm,PyCharm )? ")
-		fmt.Print("----->  (default(IDEA,Goland): ): ")
+		fmt.Println("Which product are you want Download? ")
+		fmt.Println("	1.IDEA")
+		fmt.Println("	2.Goland")
+		fmt.Println("	3.WebStorm")
+		fmt.Println("	4.PhpStorm")
+		fmt.Println("	5.PyCharm")
+		fmt.Print("Input Product Name(Example: IDEA,GOland): ")
 
 		str, _, _ := reader.ReadLine()
 
@@ -117,19 +122,19 @@ func loadProductJson() {
 		case "Go":
 			goland := &structs.Goland{}
 			json.Unmarshal(strByte, &goland)
-			productMap["Go"] = json.Unmarshal(strByte, &structs.Goland{})
+			productMap["Go"] = goland
 		case "PCP":
 			pyCharm := &structs.PyCharm{}
 			json.Unmarshal(strByte, &pyCharm)
-			productMap["PCP"] = json.Unmarshal(strByte, &structs.PyCharm{})
+			productMap["PCP"] = pyCharm
 		case "PS":
 			phpStorm := &structs.PhpStorm{}
 			json.Unmarshal(strByte, &phpStorm)
-			productMap["PS"] = json.Unmarshal(strByte, &structs.PhpStorm{})
+			productMap["PS"] = phpStorm
 		case "WS":
 			webStorm := &structs.WebStorm{}
 			json.Unmarshal(strByte, &webStorm)
-			productMap["WS"] = json.Unmarshal(strByte, &structs.WebStorm{})
+			productMap["WS"] = webStorm
 		default:
 			break
 		}
@@ -149,12 +154,11 @@ func main() {
 	for _, name := range user.productName {
 		for j := 0; j < len(meta.Software); j++ {
 			if strings.EqualFold(name, meta.Software[j].ProductName) {
-				go install(meta.Software[j].ProductCode)
+				/*go*/ install(meta.Software[j].ProductCode)
 			}
 		}
 	}
-	time.Sleep(time.Second * 5000)
-	fmt.Println("All Completed.")
+	fmt.Println("All Install Completed.")
 }
 
 func install(code string) {
@@ -164,13 +168,13 @@ func install(code string) {
 	switch obj.(type) {
 	case *structs.IIU:
 		url = obj.(*structs.IIU).Releases[0].Downloads.WindowsZip.Link
-	case structs.Goland:
+	case *structs.Goland:
 		url = obj.(*structs.Goland).Releases[0].Downloads.WindowsZip.Link
-	case structs.PyCharm:
+	case *structs.PyCharm:
 		url = obj.(*structs.PyCharm).Releases[0].Downloads.Windows.Link
-	case structs.PhpStorm:
+	case *structs.PhpStorm:
 		url = obj.(*structs.PhpStorm).Releases[0].Downloads.Windows.Link
-	case structs.WebStorm:
+	case *structs.WebStorm:
 		url = obj.(*structs.WebStorm).Releases[0].Downloads.Windows.Link
 	}
 	urlArr := strings.Split(url, "/")

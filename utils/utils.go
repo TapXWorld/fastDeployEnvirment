@@ -2,7 +2,6 @@ package utils
 
 import (
 	"archive/zip"
-	b64 "encoding/base64"
 	"fmt"
 	"github.com/schollz/progressbar/v3"
 	"io"
@@ -31,11 +30,9 @@ func HttpDownload(url string, path string, saveName string) bool {
 
 	defer f.Close()
 
-	fmt.Println(resp.ContentLength)
-
 	bar := progressbar.DefaultBytes(
 		resp.ContentLength,
-		"downloading",
+		saveName+"  -  downloading",
 	)
 	io.Copy(io.MultiWriter(f, bar), resp.Body)
 	return true
@@ -83,11 +80,6 @@ func Unzip(src string, dest string) ([]string, error) {
 		}
 	}
 	return filenames, nil
-}
-
-func decodeBase64(key string) string {
-	uDec, _ := b64.URLEncoding.DecodeString(key)
-	return string(uDec)
 }
 
 func PathExists(path string) bool {
