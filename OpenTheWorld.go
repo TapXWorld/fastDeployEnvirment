@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"github.com/TapXWorld/fastDeployEnvirment/base/structs"
 	"github.com/TapXWorld/fastDeployEnvirment/utils"
-	"github.com/goccy/go-yaml"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -84,14 +82,6 @@ func installOptions() {
 	}
 }
 
-func initStruct() {
-	regStruct["IIU"] = structs.IIU{}
-	regStruct["Go"] = structs.Goland{}
-	regStruct["WS"] = structs.WebStorm{}
-	regStruct["PS"] = structs.PhpStorm{}
-	regStruct["PCP"] = structs.PyCharm{}
-}
-
 type Meta struct {
 	Url      string
 	Software []struct {
@@ -111,9 +101,43 @@ var user = User{}
 
 var meta = Meta{}
 
-func main() {
-	initStruct()
+var productCode = []string{"IIU", "Go", "PCP", "PS", "WS"}
 
+var productMap = make(map[string]interface{})
+
+func loadProductJson() {
+	for _, p := range productCode {
+		strByte, _ := ioutil.ReadFile(".cache/" + p + ".cache")
+		switch p {
+		case "IIU":
+			iiu := &structs.IIU{}
+			json.Unmarshal(strByte, &iiu)
+			productMap["IIU"] = iiu
+		case "Go":
+			goland := &structs.Goland{}
+			json.Unmarshal(strByte, &goland)
+			productMap["Go"] = json.Unmarshal(strByte, &structs.Goland{})
+		case "PCP":
+			pyCharm := &structs.PyCharm{}
+			json.Unmarshal(strByte, &pyCharm)
+			productMap["PCP"] = json.Unmarshal(strByte, &structs.PyCharm{})
+		case "PS":
+			phpStorm := &structs.PhpStorm{}
+			json.Unmarshal(strByte, &phpStorm)
+			productMap["PS"] = json.Unmarshal(strByte, &structs.PhpStorm{})
+		case "WS":
+			webStorm := &structs.WebStorm{}
+			json.Unmarshal(strByte, &webStorm)
+			productMap["WS"] = json.Unmarshal(strByte, &structs.WebStorm{})
+		default:
+			break
+		}
+	}
+}
+
+func main() {
+	//load all cache json data to product struct
+	loadProductJson()
 	cacheVersionInfo()
 	installOptions()
 
@@ -122,37 +146,10 @@ func main() {
 	} else {
 		user.systemType = 1
 	}
-
 	for _, name := range user.productName {
 		for j := 0; j < len(meta.Software); j++ {
 			if strings.EqualFold(name, meta.Software[j].ProductName) {
-				code := meta.Software[j].ProductCode
-
-				if regStruct[code] != nil {
-					newObj := reflect.ValueOf(regStruct[code]).Type()
-
-					b, _ := ioutil.ReadFile(".cache/" + code + ".cache")
-					t := reflect.New(newObj).Elem()
-
-					var obj any
-					if "IIU" == code {
-						obj = regStruct[code].(structs.IIU)
-					} else if "Go" == code {
-						obj = t.Interface().(structs.Goland)
-					} else if "WS" == code {
-						obj = t.Interface().(structs.WebStorm)
-					} else if "PS" == code {
-						obj = t.Interface().(structs.PhpStorm)
-					} else if "PCP" == code {
-						obj = t.Interface().(structs.PyCharm)
-					} else {
-						return
-					}
-					fmt.Println(obj.(structs.IIU))
-
-					json.Unmarshal(b, (obj.(structs.IIU)))
-					go install(code, obj)
-				}
+				go install(meta.Software[j].ProductCode)
 			}
 		}
 	}
@@ -160,30 +157,31 @@ func main() {
 	fmt.Println("All Completed.")
 }
 
-var regStruct = make(map[string]interface{})
-
-type UnzipStruct struct {
-	src  string
-	desc string
-}
-
-func install(name string, s interface{}) {
-	unzipFileArr := make([]UnzipStruct, 0)
-
+func install(code string) {
 	var url string
-	if "IIU" == name {
-		url = s.(structs.IIU).Releases[0].Downloads.WindowsZip.Link
-	} else if "Go" == name {
-		url = s.(structs.Goland).Releases[0].Downloads.WindowsZip.Link
-	} else if "WS" == name {
-		url = s.(structs.WebStorm).Releases[0].Downloads.Windows.Link
-	} else if "PS" == name {
-		url = s.(structs.PhpStorm).Releases[0].Downloads.Windows.Link
-	} else if "PCP" == name {
-		url = s.(structs.PyCharm).Releases[0].Downloads.Windows.Link
+	var obj = productMap[code]
+
+	switch obj.(type) {
+	case *structs.IIU:
+		url = obj.(*structs.IIU).Releases[0].Downloads.WindowsZip.Link
+	case structs.Goland:
+		url = obj.(*structs.Goland).Releases[0].Downloads.WindowsZip.Link
+	case structs.PyCharm:
+		url = obj.(*structs.PyCharm).Releases[0].Downloads.Windows.Link
+	case structs.PhpStorm:
+		url = obj.(*structs.PhpStorm).Releases[0].Downloads.Windows.Link
+	case structs.WebStorm:
+		url = obj.(*structs.WebStorm).Releases[0].Downloads.Windows.Link
 	}
 	urlArr := strings.Split(url, "/")
 	filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-	utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-	unzipFileArr = append(unzipFileArr, UnzipStruct{src: filePath, desc: user.downloadPath + "/" + name})
+
+	if _, err := os.Stat(filePath); err != nil {
+		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
+	}
+
+	nameArr := strings.Split(strings.Replace(urlArr[len(urlArr)-1], ".", "_", 0), ".")
+	fullName := strings.Join(nameArr[0:len(nameArr)-2], ".")
+
+	utils.Unzip(filePath, user.downloadPath+"/"+fullName)
 }
