@@ -39,12 +39,12 @@ func cacheVersionInfo() {
 	}
 }
 
-func validateInput(u User) bool {
-	for i := 0; i < len(u.productName); i++ {
+func validateInput(u utils.User) bool {
+	for i := 0; i < len(u.ProductName); i++ {
 		inputError := true
 
 		for j := 0; j < len(meta.Software); j++ {
-			if strings.ToLower(u.productName[i]) == strings.ToLower(meta.Software[j].ProductName) {
+			if strings.ToLower(u.ProductName[i]) == strings.ToLower(meta.Software[j].ProductName) {
 				inputError = false
 			}
 		}
@@ -71,14 +71,14 @@ func installOptions() {
 
 		product := strings.Replace(string(str), " ", "", -1)
 
-		user.productName = strings.Split(product, ",")
+		user.ProductName = strings.Split(product, ",")
 
 		fmt.Println("Where to save? ")
 		fmt.Print("----->  (default: \"D:\\software\\\"): ")
 
 		savePath, _, _ := reader.ReadLine()
 
-		user.downloadPath = string(savePath)
+		user.DownloadPath = string(savePath)
 
 		if validateInput(user) {
 			fmt.Println("validate error,　input again.")
@@ -96,14 +96,6 @@ type Meta struct {
 		Parameters  string `yaml:"parameters"`
 	}
 }
-
-type User struct {
-	productName  []string
-	downloadPath string
-	systemType   int //0 window 1 linux
-}
-
-var user = User{}
 
 var meta = Meta{}
 
@@ -141,51 +133,35 @@ func loadProductJson() {
 	}
 }
 
+var user = utils.User{}
+
 func main() {
 	loadProductJson()
 	cacheVersionInfo()
 	installOptions()
 
 	if "windows" == runtime.GOOS {
-		user.systemType = 0
+		user.SystemType = 0
 	} else {
-		user.systemType = 1
+		user.SystemType = 1
 	}
-	for _, name := range user.productName {
+	for _, name := range user.ProductName {
 		for j := 0; j < len(meta.Software); j++ {
 			if strings.EqualFold(name, meta.Software[j].ProductName) {
-				/*go*/ install(meta.Software[j].ProductCode)
+				//install IDE
+				utils.Install(meta.Software[j].ProductCode, productMap, user)
+
+				//create Launcher
+				if user.SystemType == 0 {
+					utils.CreateWindowsLauncher()
+				} else {
+					utils.CreateLinuxLauncher()
+				}
+
+				//create license
+				utils.CrackLicense()
 			}
 		}
 	}
 	fmt.Println("All Install Completed.")
-}
-
-func install(code string) {
-	var url string
-	var obj = productMap[code]
-
-	switch obj.(type) {
-	case *structs.IIU:
-		url = obj.(*structs.IIU).Releases[0].Downloads.WindowsZip.Link
-	case *structs.Goland:
-		url = obj.(*structs.Goland).Releases[0].Downloads.WindowsZip.Link
-	case *structs.PyCharm:
-		url = obj.(*structs.PyCharm).Releases[0].Downloads.Windows.Link
-	case *structs.PhpStorm:
-		url = obj.(*structs.PhpStorm).Releases[0].Downloads.Windows.Link
-	case *structs.WebStorm:
-		url = obj.(*structs.WebStorm).Releases[0].Downloads.Windows.Link
-	}
-	urlArr := strings.Split(url, "/")
-	filePath := user.downloadPath + "/" + urlArr[len(urlArr)-1]
-
-	if _, err := os.Stat(filePath); err != nil {
-		utils.HttpDownload(url, user.downloadPath, urlArr[len(urlArr)-1])
-	}
-
-	nameArr := strings.Split(strings.Replace(urlArr[len(urlArr)-1], ".", "_", 0), ".")
-	fullName := strings.Join(nameArr[0:len(nameArr)-2], ".")
-
-	utils.Unzip(filePath, user.downloadPath+"/"+fullName)
 }
