@@ -148,14 +148,16 @@ func main() {
 	for _, name := range user.ProductName {
 		for j := 0; j < len(meta.Software); j++ {
 			if strings.EqualFold(name, meta.Software[j].ProductName) {
+				productCode := meta.Software[j].ProductCode
+
 				//install IDE
-				utils.Install(meta.Software[j].ProductCode, productMap, user)
+				utils.Install(productCode, productMap, user)
 
 				//create Launcher
 				if user.SystemType == 0 {
-					utils.CreateWindowsLauncher()
+					utils.CreateWindowsLauncher(user.DownloadPath, productCode)
 				} else {
-					utils.CreateLinuxLauncher()
+					utils.CreateLinuxLauncher(user.DownloadPath, productCode)
 				}
 
 				//create license
