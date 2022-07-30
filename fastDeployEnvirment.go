@@ -65,7 +65,7 @@ func installOptions() {
 		fmt.Println("	3.WebStorm")
 		fmt.Println("	4.PhpStorm")
 		fmt.Println("	5.PyCharm")
-		fmt.Print("Input Product Name(Example: IDEA,GOland): ")
+		fmt.Print("Input Product Name(Example: IDEA,Goland): ")
 
 		str, _, _ := reader.ReadLine()
 
@@ -151,15 +151,14 @@ func main() {
 				productCode := meta.Software[j].ProductCode
 
 				//install IDE
-				utils.Install(productCode, productMap, user)
+				utils.Install(productCode, productMap, &user)
 
 				//create Launcher
 				if user.SystemType == 0 {
-					utils.CreateWindowsLauncher(user.DownloadPath, productCode)
+					utils.CreateWindowsLauncher(user.DownloadPath, user, name)
 				} else {
-					utils.CreateLinuxLauncher(user.DownloadPath, productCode)
+					utils.CreateLinuxLauncher(user.DownloadPath, user, name)
 				}
-
 				//create license
 				utils.CrackLicense()
 			}

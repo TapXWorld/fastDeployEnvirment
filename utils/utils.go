@@ -1,14 +1,15 @@
 package utils
 
 import (
-	"archive/zip"
-	"fmt"
+	"bytes"
+	"context"
+	"github.com/codeclysm/extract/v3"
 	"github.com/schollz/progressbar/v3"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -38,48 +39,27 @@ func HttpDownload(url string, path string, saveName string) bool {
 	return true
 }
 
-func Unzip(src string, dest string) ([]string, error) {
-	var filenames []string
+func DecompressFile(filePath string, extractPath string) {
+	data, _ := ioutil.ReadFile(filePath)
+	buffer := bytes.NewBuffer(data)
 
-	r, err := zip.OpenReader(src)
+	type Files map[string]string
+
+	var shift = func(path string) string {
+		return strings.ToLower(path)
+	}
+	err := extract.Archive(context.Background(), buffer, extractPath, shift)
 	if err != nil {
-		return filenames, err
+		log.Fatalln("err happened when extract file.", err)
 	}
-	defer r.Close()
+}
 
-	for _, f := range r.File {
-		path := filepath.Join(dest, f.Name)
-
-		if !strings.HasPrefix(path, filepath.Clean(dest)+string(os.PathSeparator)) {
-			return filenames, fmt.Errorf("%s: illegal file path", path)
-		}
-
-		filenames = append(filenames, path)
-
-		if f.FileInfo().IsDir() {
-			// Make Folder
-			os.MkdirAll(path, os.ModePerm)
-			continue
-		}
-		if err = os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
-			return filenames, err
-		}
-
-		outFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil {
-			return filenames, err
-		}
-		rc, _ := f.Open()
-
-		io.Copy(outFile, rc)
-
-		outFile.Close()
-		rc.Close()
-		if err != nil {
-			return filenames, err
-		}
+func createFile(name string) (*os.File, error) {
+	err := os.MkdirAll(string([]rune(name)[0:strings.LastIndex(name, "/")]), 0755)
+	if err != nil {
+		return nil, err
 	}
-	return filenames, nil
+	return os.Create(name)
 }
 
 func PathExists(path string) bool {

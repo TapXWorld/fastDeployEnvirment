@@ -1,35 +1,50 @@
 package utils
 
 import (
+	"io/ioutil"
+	"log"
 	"os"
-	"os/user"
+	"os/exec"
 )
 
-func CreateLinuxLauncher(path string, code string) {
-	user, _ := user.Current()
-
+func CreateLinuxLauncher(path string, user User, code string) bool {
 	shortcutText := "[Desktop Entry]" + "\n" +
 		"Version=1.0" + "\n" +
 		"Type=Application" + "\n" +
 		"Name=" + code + "" + "\n" +
-		"Icon=" + path + "bin/goland.png" + "\n" +
-		"Exec='" + path + "/bin/goland.sh %f'" + "\n" +
+		"Icon=" + path + user.ProductFullName + "/bin/goland.png" + "\n" +
+		"Exec=" + path + user.ProductFullName + "/bin/goland.sh" + "\n" +
 		"Comment=" + code + " IDE" + "\n" +
-		"Categories=Development;IDE;" + "\n" +
 		"Terminal=false" + "\n" +
-		"StartupWMClass=jetbrains-gogland"
+		"StartupWMClass=jetbrains-goland"
 
-	username := user.Username
+	error := ioutil.WriteFile(os.ExpandEnv("$HOME/Desktop/"+code+".desktop"), ([]byte)(shortcutText), 0644)
 
-	shortcutLink := "/home/" + username + "/Desktop/" + code + ".desktop"
-
-	file, _ := os.Create(shortcutLink)
-
-	file.Write([]byte(shortcutText))
+	if error != nil {
+		log.Fatalln("error happened when create launcher.")
+		log.Fatalln(error)
+		return false
+	}
+	return true
 }
 
-func CreateWindowsLauncher(path string, code string) {
-	//get current user home
+// CreateWindowsLauncher invoke powershell create shortcut
+func CreateWindowsLauncher(path string, user User, code string) bool {
+	sourceFilePath := "$SourceFilePath = \"D:\\PowerShell\\\""
+	shortcutPath := "$ShortcutPath = \"C:\\Users\\admin\\Desktop\\powershell.lnk\""
+	wscriptObj := "$WScriptObj = New-Object -ComObject (\"WScript.Shell\")"
+	shortcut := "$shortcut = $WscriptObj.CreateShortcut($ShortcutPath)"
+	shortcutTargetPath := "$shortcut.TargetPath = $SourceFilePath"
+	shortcutWindowStyle := "$shortcut.WindowStyle = 1"
+	shortcutSave := "$shortcut.Save()"
 
-	//
+	command := sourceFilePath + shortcutPath + wscriptObj + shortcut + shortcutTargetPath + shortcutWindowStyle + shortcutSave
+
+	_, error := exec.Command("powershell", "-Exec bypass", command).CombinedOutput()
+	if error != nil {
+		log.Fatalln("error happened when create launcher.")
+		log.Fatalln(error)
+		return false
+	}
+	return true
 }
